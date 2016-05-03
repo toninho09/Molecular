@@ -1,0 +1,18 @@
+{
+    "name": "root/molecular1.0",
+    "authors": [
+        {
+            "name": "antonio",
+            "email": "toninho0007@yahoo.com.br"
+        }
+    ],
+    "require": {
+        "phpunit/phpunit": "4.6.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Molecular\\": "src/Molecular",
+            "Tests\\": "test/"
+        }
+    }
+}
