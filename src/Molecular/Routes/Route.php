@@ -70,19 +70,19 @@ class Route
     }
 
     public function isValidMethod(){
-        if($this->method == 'any') return true;
+        if($this->method == strtolower('any')) return true;
         return $this->method == $_SERVER['REQUEST_METHOD'];
     }
 
     public function isRouteValid(){
-        if(preg_match("/^".$this->route."$/",$_SERVER['REQUEST_URI'],$match)){
+        if(preg_match("/^[\/]?".$this->route."$/",$_SERVER['REQUEST_URI'],$match)){
             return true;
         }
         return false;
     }
 
     public function run(){
-        if($this->isRouteValid()) throw new \Exception("This Route is not valid to call");
+        if(!$this->isRouteValid()) throw new \Exception("This Route is not valid to call");
         if($this->filter->exists('before')) $this->filter->run('before');
         $return = $this->call->runFunction($this->function,$this->getParams());
         if($this->filter->exists('after')) $this->filter->run('after');

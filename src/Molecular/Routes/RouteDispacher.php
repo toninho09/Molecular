@@ -111,7 +111,7 @@ class RouteDispacher
 
     public function run()
     {
-        $this->filters->run('before');
+        if($this->filters->exists('before'))$this->filters->run('before');
         $buffer = '';
         foreach ($this->routes as $route) {
             if ($route->isValidMethod() && $route->isRouteValid()) {
@@ -120,7 +120,7 @@ class RouteDispacher
                 break;
             }
         }
-        $this->filters->run('after');
+        if($this->filters->exists('after'))$this->filters->run('after');
         return $buffer;
     }
 
@@ -141,7 +141,7 @@ class RouteDispacher
         if ($this->group != '' && $this->group{0} != '/') {
             $this->group = '/' . $this->group;
         }
-        $route = new Route($this->putRegex($this->group . $name), $method, $function);
+        $route = new Route($this->group . $name, $method, $function);
         if (isset($params['as'])) $route->setName($params['as']);
         if (isset($params['filters'])) $route->getFilter()->setArrayFilter($params['filters']);
         if (isset($params['next'])) $route->setNext();

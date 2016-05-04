@@ -6,7 +6,7 @@
  * Time: 00:16
  */
 
-namespace Tests\Molecular\Routes;
+namespace Tests\Molecular\Helper;
 
 
 use Molecular\Helper\Callbacks\Call;
