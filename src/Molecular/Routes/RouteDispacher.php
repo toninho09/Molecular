@@ -17,10 +17,11 @@ class RouteDispacher
     private $notFound;
     private $next;
     private $filters;
+    private $prefix;
 
     public function __construct()
     {
-        $this->group = '';
+        $this->prefix = '';
         $this->next = false;
         $this->filters = new Filter();
     }
@@ -40,42 +41,47 @@ class RouteDispacher
         $this->filters->setFilter($name, $function);
     }
 
-    public function post($name, $function)
+    public function getFilters()
     {
-        $this->registerRoute('POST', $name, $function);
+        return $this->filters;
     }
 
-    public function get($name, $function)
+    public function post($name, $function, $params = [])
     {
-        $this->registerRoute('GET', $name, $function);
+        $this->registerRoute('POST', $name, $function, $params);
     }
 
-    public function put($name, $function)
+    public function get($name, $function, $params = [])
     {
-        $this->registerRoute('PUT', $name, $function);
+        $this->registerRoute('GET', $name, $function, $params);
     }
 
-    public function delete($name, $function)
+    public function put($name, $function, $params = [])
     {
-        $this->registerRoute('DELETE', $name, $function);
+        $this->registerRoute('PUT', $name, $function, $params);
     }
 
-    public function option($name, $function)
+    public function delete($name, $function, $params = [])
     {
-        $this->registerRoute('OPTION', $name, $function);
+        $this->registerRoute('DELETE', $name, $function, $params);
     }
 
-    public function path($name, $function)
+    public function option($name, $function, $params = [])
     {
-        $this->registerRoute('PATH', $name, $function);
+        $this->registerRoute('OPTION', $name, $function, $params);
     }
 
-    public function head($name, $function)
+    public function path($name, $function, $params = [])
     {
-        $this->registerRoute('HEAD', $name, $function);
+        $this->registerRoute('PATH', $name, $function, $params);
     }
 
-    public function any($name, $function)
+    public function head($name, $function, $params = [])
+    {
+        $this->registerRoute('HEAD', $name, $function, $params);
+    }
+
+    public function any($name, $function, $params = [])
     {
         $this->registerRoute($_SERVER['REQUEST_METHOD'], $name, $function);
     }
@@ -90,58 +96,86 @@ class RouteDispacher
         $this->next = true;
     }
 
-    public function custom($method, $name, $function)
+    public function custom($method, $name, $function, $params = [])
     {
         if (is_array($method)) {
             foreach ($method as $value) {
-                $this->registerRoute($value, $name, $function);
+                $this->registerRoute($value, $name, $function, $params);
             }
         } else {
-            $this->registerRoute($method, $name, $function);
+            $this->registerRoute($method, $name, $function, $params);
         }
     }
 
-    public function group($nameGroup, $callback)
+    private function fixPrefix($prefix)
     {
-        $oldGroup = $this->group;
-        $this->group .= $nameGroup;
-        $callback();
-        $this->group = $oldGroup;
+        if (substr($this->prefix, -1) != '/' && $prefix{0} != '/') {
+            $prefix = '/' . $prefix;
+        }
+        return $prefix;
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $this->fixPrefix($prefix);
+    }
+
+    public function group($nameGroup, $callback, $params = [])
+    {
+        $dispacher = new RouteDispacher();
+        $dispacher->setPrefix($this->fixPrefix($nameGroup));
+        $callback($dispacher);
+        $routes = $dispacher->getRoutes();
+        foreach ($routes as $keyRoute => $valueRoute) {
+            if (!empty($params['filters'])) $valueRoute->getFilter()->setArrayFilter($params['filters']);
+            $this->routes[] = $valueRoute;
+            unset($routes[$keyRoute]);
+        }
     }
 
     public function run()
     {
-        if($this->filters->exists('before'))$this->filters->run('before');
+        if ($this->filters->exists('before')) $this->filters->run('before');
         $buffer = '';
         foreach ($this->routes as $route) {
             if ($route->isValidMethod() && $route->isRouteValid()) {
                 $buffer = $route->run();
-                if($route->next()) continue;
+                if ($route->next()) continue;
                 break;
             }
         }
-        if($this->filters->exists('after'))$this->filters->run('after');
+        if ($this->filters->exists('after')) $this->filters->run('after');
         return $buffer;
     }
 
-    public function getRouteByName($name){
-        foreach ($this->routes as $route){
-            if($name == $route->getName()) return $route;
+    public function getRouteByName($name)
+    {
+        foreach ($this->routes as $route) {
+            if ($name == $route->getName()) return $route;
         }
+    }
+
+    public function getRoutes()
+    {
+        return $this->routes;
     }
 
     private function registerRoute($method, $name, $function, $params = [])
     {
-        if (($name == '' && $this->group == '') ||
-            ($name == '' && $this->group{strlen($this->group)} != '/') ||
-            ($name{0} == '' && $this->group == '')
-        ) {
-            $name = '/' . $name;
+        if (substr($name, 1) == '/') {
+            str_split($name, 1);
         }
-        if ($this->group != '' && $this->group{0} != '/') {
-            $this->group = '/' . $this->group;
+        if ($this->prefix != '' && $this->prefix{0} != '/') {
+            $this->prefix = '/' . $this->prefix;
         }
-        $route = new Route($this->group . $name, $method, $function);
+        if ($this->prefix != '' && $this->prefix{strlen($this->prefix) - 1} != '/') {
+            $this->prefix .= '/';
+        }
+        if ($this->prefix == '' && $name == '') {
+            $this->prefix = '/';
+        }
+
+        $route = new Route($this->prefix . $name, $method, $function);
         if (isset($params['as'])) $route->setName($params['as']);
         if (isset($params['filters'])) $route->getFilter()->setArrayFilter($params['filters']);
         if (isset($params['next'])) $route->setNext();

@@ -83,10 +83,11 @@ class Route
 
     public function run(){
         if(!$this->isRouteValid()) throw new \Exception("This Route is not valid to call");
-        if($this->filter->exists('before')) $this->filter->run('before');
-        $return = $this->call->runFunction($this->function,$this->getParams());
-        if($this->filter->exists('after')) $this->filter->run('after');
-        return $return;
+        $buffer = '';
+        if($this->filter->exists('before'))$buffer .= $this->filter->run('before');
+        $buffer .= $this->call->runFunction($this->function,$this->getParams());
+        if($this->filter->exists('after')) $buffer .= $this->filter->run('after');
+        return $buffer;
 
     }
 

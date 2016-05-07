@@ -27,13 +27,29 @@ class Filter
 
     public function setFilter($name, $callback)
     {
-        $this->filters[$name] = $callback;
+        $this->filters[$name][] = $callback;
     }
 
     public function run($name)
     {
         if (!$this->exists($name)) throw new \Exception("Filter $name is not defined");
-        return $this->call($this->filters[$name]);
+        return $this->runArrayFilters($this->filters[$name]);
+    }
+
+    private function runArrayFilters($function){
+        $buffer = '';
+        if(is_array($function)){
+            foreach ($function as $key => $value){
+                if(is_array($value)){
+                    $buffer .= $this->runArrayFilters($value);
+                }else{
+                    $buffer.= $this->call->runFunction($value);
+                }
+            }
+        }else{
+            $buffer.= $this->call->runFunction($function);
+        }
+        return $buffer;
     }
 
     public function exists($name)
@@ -46,6 +62,10 @@ class Filter
         foreach ($filters as $key => $value) {
             $this->setFilter($key, $value);
         }
+    }
+
+    public function getFilters(){
+        return $this->filters;
     }
 
 

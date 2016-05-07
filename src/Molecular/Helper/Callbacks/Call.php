@@ -22,6 +22,25 @@ class Call
         }
     }
 
+    public function isRunnable($function){
+        if (is_callable($function)) {
+            return true;
+        } elseif (is_string($function)) {
+            preg_match("/(.*)@(\w+)/", $function, $funcParams);
+            unset($funcParams[0]);
+            if (count($funcParams) != 2) {
+                return false;
+            }
+            if (class_exists($funcParams[1])) {
+                $class = new $funcParams[1]();
+                if (method_exists($class, $funcParams[2])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private function runNameFunction($function, $match)
     {
         preg_match("/(\w+)@(\w+)/", $function, $funcParams);
