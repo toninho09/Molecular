@@ -88,7 +88,6 @@ class Route
         $buffer .= $this->call->runFunction($this->function,$this->getParams());
         if($this->filter->exists('after')) $buffer .= $this->filter->run('after');
         return $buffer;
-
     }
 
     public function getParams(){
