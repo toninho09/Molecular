@@ -9,6 +9,7 @@
 namespace Molecular\Framework;
 
 
+use Molecular\Container\ServiceContainer;
 use Molecular\Http\Request;
 use Molecular\Http\Response;
 use Molecular\Routes\RouteDispacher;
@@ -20,6 +21,7 @@ class Application
     public $request;
     private $moleculeDispancer;
     public $route;
+    public $container;
     /**
      * Application constructor.
      */
@@ -29,6 +31,7 @@ class Application
         $this->route = new RouteDispacher();
         $this->request = new Request();
         $this->response = new Response();
+        $this->container = new ServiceContainer();
     }
 
     public function addMolecule(AbstractMolecule $molecule){
@@ -41,13 +44,13 @@ class Application
 
     public function run(){
         $this->response->setResponseContent($this->route->run());
-        foreach ($this->moleculeDispancer as $key => $value){
+        foreach ($this->moleculeDispancer as $value){
             $value->run();
         }
     }
 
     public function end(){
-        foreach ($this->moleculeDispancer as $key => $value){
+        foreach ($this->moleculeDispancer as $value){
             $value->end();
         }
     }

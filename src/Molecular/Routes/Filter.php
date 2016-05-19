@@ -39,7 +39,7 @@ class Filter
     private function runArrayFilters($function){
         $buffer = '';
         if(is_array($function)){
-            foreach ($function as $key => $value){
+            foreach ($function as  $value){
                 if(is_array($value)){
                     $buffer .= $this->runArrayFilters($value);
                 }else{

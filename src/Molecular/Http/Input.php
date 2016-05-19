@@ -13,8 +13,13 @@ class Input
 {
 
     public function get($value,$default = null){
-        if(isset($_GET[$value])) return $value;
-        if(isset($_POST[$value])) return $value;
+        if(isset($_GET[$value])) return $_GET[$value];
+        if(isset($_POST[$value])) return $_POST[$value];
+        return $default;
+    }
+
+    public function post($value,$default = null){
+        if(isset($_POST[$value])) return $_POST[$value];
         return $default;
     }
 

@@ -13,7 +13,6 @@ class RouteDispacher
 {
 
     private $routes = [];
-    private $group;
     private $notFound;
     private $next;
     private $filters;
@@ -83,7 +82,7 @@ class RouteDispacher
 
     public function any($name, $function, $params = [])
     {
-        $this->registerRoute($_SERVER['REQUEST_METHOD'], $name, $function);
+        $this->registerRoute($_SERVER['REQUEST_METHOD'], $name, $function, $params);
     }
 
     public function setNotFound($function)
@@ -153,6 +152,7 @@ class RouteDispacher
         foreach ($this->routes as $route) {
             if ($name == $route->getName()) return $route;
         }
+        throw new \Exception('Route not found');
     }
 
     public function getRoutes()

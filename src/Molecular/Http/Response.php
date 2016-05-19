@@ -22,7 +22,7 @@
 
 		public function getHeader($nameHeader = ''){
 			$headers = [];
-			foreach (headers_list() as $key => $value) {
+			foreach (headers_list() as $value) {
 				$temp = '';
 				preg_match('/^(\X.*):(\X.*)$/', $value ,$temp);
 				$headers[$temp[1]] = $temp[2];

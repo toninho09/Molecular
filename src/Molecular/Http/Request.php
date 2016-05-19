@@ -1,7 +1,22 @@
 <?php
 	namespace Molecular\Http;
 	class Request{
-		public function getRequestURI(){
+
+        private $input;
+
+        /**
+         * Request constructor.
+         */
+        public function __construct()
+        {
+            $this->input = new Input();
+        }
+
+        public function input(){
+            return $this->input;
+        }
+
+        public function getRequestURI(){
 			return $_SERVER['REQUEST_URI'];
 		}
 		public function getMethod(){
