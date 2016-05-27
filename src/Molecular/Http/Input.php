@@ -11,6 +11,14 @@ namespace Molecular\Http;
 
 class Input
 {
+    private $jsonValues;
+    /**
+     * Input constructor.
+     */
+    public function __construct()
+    {
+        $this->jsonValues = $this->json();
+    }
 
     /**
      * @param $value
@@ -20,6 +28,7 @@ class Input
     public function get($value, $default = null){
         if(isset($_GET[$value])) return $_GET[$value];
         if(isset($_POST[$value])) return $_POST[$value];
+        if(isset($this->jsonValues[$value])) return $this->jsonValues[$value];
         return $default;
     }
 
@@ -45,8 +54,8 @@ class Input
     /**
      * @return mixed
      */
-    public function json(){
-        return json_decode($this->getPHPInput());
+    public function json($assoc = true){
+        return json_decode($this->getPHPInput(),$assoc);
     }
 
     /**
