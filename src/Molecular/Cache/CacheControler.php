@@ -17,11 +17,18 @@ class CacheControler
      */
     public function __construct()
     {
-
+        $this->cache = new CacheFile();
     }
 
     public function setHandle(CacheHandle $cache){
         $this->cache = $cache;
+    }
+
+    /**
+     * @return CacheHandle|null
+     */
+    public function getHandle(){
+        return $this->cache;
     }
     
 }

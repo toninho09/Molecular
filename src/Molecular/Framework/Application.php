@@ -9,6 +9,7 @@
 namespace Molecular\Framework;
 
 
+use Molecular\Cache\CacheControler;
 use Molecular\Container\ServiceContainer;
 use Molecular\Http\Request;
 use Molecular\Http\Response;
@@ -22,6 +23,7 @@ class Application
     private $moleculeDispancer;
     public $route;
     public $container;
+    public $cache;
     /**
      * Application constructor.
      */
@@ -32,6 +34,8 @@ class Application
         $this->request = new Request();
         $this->response = new Response();
         $this->container = new ServiceContainer();
+        $cache = new CacheControler();
+        $this->cache = $cache->getHandle();
     }
 
     public function addMolecule(AbstractMolecule $molecule){
