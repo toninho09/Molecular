@@ -59,7 +59,7 @@ class Call
      */
     private function runNameFunction($function, $match)
     {
-        preg_match("/(\w+)@(\w+)/", $function, $funcParams);
+        preg_match("/(.*)@(\w+)/", $function, $funcParams);
         unset($funcParams[0]);
         if (count($funcParams) != 2) {
             throw new \Exception("Method call is not 'CLASS@METHOD' ");

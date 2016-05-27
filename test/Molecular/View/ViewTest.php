@@ -15,6 +15,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->setFile('testeViewRender.php');
 
         $this->assertEquals($view->render(),'ok');
+        $this->assertEquals((string)$view,'ok');
 
     }
 }

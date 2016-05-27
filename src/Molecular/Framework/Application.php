@@ -24,6 +24,7 @@ class Application
     public $route;
     public $container;
     public $cache;
+    public static $instance;
     /**
      * Application constructor.
      */
@@ -36,6 +37,7 @@ class Application
         $this->container = new ServiceContainer();
         $cache = new CacheControler();
         $this->cache = $cache->getHandle();
+        self::$instance = $this;
     }
 
     public function addMolecule(AbstractMolecule $molecule){
