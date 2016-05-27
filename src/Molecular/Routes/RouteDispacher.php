@@ -25,76 +25,141 @@ class RouteDispacher
         $this->filters = new Filter();
     }
 
+    /**
+     * @param $function
+     */
     public function after($function)
     {
         $this->filters->setFilter('after', $function);
     }
 
+    /**
+     * @param $function
+     */
     public function before($function)
     {
         $this->filters->setFilter('before', $function);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     */
     public function filter($name, $function)
     {
         $this->filters->setFilter($name, $function);
     }
 
+    /**
+     * @return Filter
+     */
     public function getFilters()
     {
         return $this->filters;
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function post($name, $function, $params = [])
     {
         $this->registerRoute('POST', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function get($name, $function, $params = [])
     {
         $this->registerRoute('GET', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function put($name, $function, $params = [])
     {
         $this->registerRoute('PUT', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function delete($name, $function, $params = [])
     {
         $this->registerRoute('DELETE', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function option($name, $function, $params = [])
     {
         $this->registerRoute('OPTION', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function path($name, $function, $params = [])
     {
         $this->registerRoute('PATH', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function head($name, $function, $params = [])
     {
         $this->registerRoute('HEAD', $name, $function, $params);
     }
 
+    /**
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function any($name, $function, $params = [])
     {
         $this->registerRoute($_SERVER['REQUEST_METHOD'], $name, $function, $params);
     }
 
+    /**
+     * @param $function
+     */
     public function setNotFound($function)
     {
         $this->notFound = $function;
     }
 
+    /**
+     *
+     */
     public function next()
     {
         $this->next = true;
     }
 
+    /**
+     * @param $method
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     public function custom($method, $name, $function, $params = [])
     {
         if (is_array($method)) {
@@ -106,6 +171,10 @@ class RouteDispacher
         }
     }
 
+    /**
+     * @param $prefix
+     * @return string
+     */
     private function fixPrefix($prefix)
     {
         if (substr($this->prefix, -1) != '/' && $prefix{0} != '/') {
@@ -114,11 +183,19 @@ class RouteDispacher
         return $prefix;
     }
 
+    /**
+     * @param $prefix
+     */
     public function setPrefix($prefix)
     {
         $this->prefix = $this->fixPrefix($prefix);
     }
 
+    /**
+     * @param $nameGroup
+     * @param $callback
+     * @param array $params
+     */
     public function group($nameGroup, $callback, $params = [])
     {
         $dispacher = new RouteDispacher();
@@ -132,6 +209,10 @@ class RouteDispacher
         }
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function run()
     {
         if ($this->filters->exists('before')) $this->filters->run('before');
@@ -147,6 +228,11 @@ class RouteDispacher
         return $buffer;
     }
 
+    /**
+     * @param $name
+     * @return mixed
+     * @throws \Exception
+     */
     public function getRouteByName($name)
     {
         foreach ($this->routes as $route) {
@@ -155,11 +241,20 @@ class RouteDispacher
         throw new \Exception('Route not found');
     }
 
+    /**
+     * @return array
+     */
     public function getRoutes()
     {
         return $this->routes;
     }
 
+    /**
+     * @param $method
+     * @param $name
+     * @param $function
+     * @param array $params
+     */
     private function registerRoute($method, $name, $function, $params = [])
     {
         if (substr($name, 1) == '/') {

@@ -11,6 +11,12 @@ namespace Molecular\Helper\Callbacks;
 
 class Call
 {
+    /**
+     * @param $function
+     * @param array $match
+     * @return mixed
+     * @throws \Exception
+     */
     public function runFunction($function, $match = [])
     {
         if (is_callable($function)) {
@@ -22,6 +28,10 @@ class Call
         }
     }
 
+    /**
+     * @param $function
+     * @return bool
+     */
     public function isRunnable($function){
         if (is_callable($function)) {
             return true;
@@ -41,6 +51,12 @@ class Call
         return false;
     }
 
+    /**
+     * @param $function
+     * @param $match
+     * @return mixed
+     * @throws \Exception
+     */
     private function runNameFunction($function, $match)
     {
         preg_match("/(\w+)@(\w+)/", $function, $funcParams);

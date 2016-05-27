@@ -69,11 +69,17 @@ class Route
         $this->name = $name;
     }
 
+    /**
+     * @return bool
+     */
     public function isValidMethod(){
         if($this->method == strtolower('any')) return true;
         return $this->method == $_SERVER['REQUEST_METHOD'];
     }
 
+    /**
+     * @return bool
+     */
     public function isRouteValid(){
         if(preg_match("/^[\/]?".$this->route."$/",$_SERVER['REQUEST_URI'],$match)){
             return true;
@@ -81,6 +87,10 @@ class Route
         return false;
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function run(){
         if(!$this->isRouteValid()) throw new \Exception("This Route is not valid to call");
         $buffer = '';
@@ -90,12 +100,19 @@ class Route
         return $buffer;
     }
 
+    /**
+     * @return mixed
+     */
     public function getParams(){
         preg_match("/^".$this->route."$/",$_SERVER['REQUEST_URI'],$match);
         unset($match[0]);
         return $match;
     }
 
+    /**
+     * @param $name
+     * @return mixed
+     */
     private function putRegex($name){
         return preg_replace(['/{\w+}/','/\/{\w+\?}/','/\\//','/\//'],['(\w+)','(\/\w+)?','/','\\/'],$name);
     }

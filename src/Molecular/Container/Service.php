@@ -32,11 +32,19 @@ class Service
         $this->call = new Call();
     }
 
+    /**
+     * @param $callback
+     * @param array $params
+     */
     public function set($callback, $params = []){
         $this->callback = $callback;
         $this->params = $params;
     }
 
+    /**
+     * @return mixed|null
+     * @throws \Exception
+     */
     public function get(){
         if($this->singleton && $this->service != null){
             return $this->service;
@@ -49,6 +57,9 @@ class Service
         return $this->service;
     }
 
+    /**
+     * @param $singleton
+     */
     public function setSingleton($singleton){
         $this->singleton = $singleton;
     }

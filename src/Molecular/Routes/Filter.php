@@ -25,17 +25,31 @@ class Filter
         $this->call = new Call();
     }
 
+    /**
+     * @param $name
+     * @param $callback
+     */
     public function setFilter($name, $callback)
     {
         $this->filters[$name][] = $callback;
     }
 
+    /**
+     * @param $name
+     * @return string
+     * @throws \Exception
+     */
     public function run($name)
     {
         if (!$this->exists($name)) throw new \Exception("Filter $name is not defined");
         return $this->runArrayFilters($this->filters[$name]);
     }
 
+    /**
+     * @param $function
+     * @return string
+     * @throws \Exception
+     */
     private function runArrayFilters($function){
         $buffer = '';
         if(is_array($function)){
@@ -52,11 +66,18 @@ class Filter
         return $buffer;
     }
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function exists($name)
     {
         return isset($this->filters[$name]);
     }
 
+    /**
+     * @param array $filters
+     */
     public function setArrayFilter(array $filters)
     {
         foreach ($filters as $key => $value) {
@@ -64,6 +85,9 @@ class Filter
         }
     }
 
+    /**
+     * @return array
+     */
     public function getFilters(){
         return $this->filters;
     }

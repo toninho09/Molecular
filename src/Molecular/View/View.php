@@ -15,6 +15,10 @@ class View
     private $defaultViewPath;
     private $data;
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     function __toString(){
         return $this->render();
     }
@@ -26,18 +30,32 @@ class View
         $this->data = [];
     }
 
+    /**
+     * @param $path
+     */
     public function setDefaultViewPath($path){
         $this->defaultViewPath = $path;
     }
 
+    /**
+     * @param $file
+     */
     public function setFile($file){
         $this->file = $file;
     }
 
+    /**
+     * @return string
+     */
     public function getDefaultViewPath(){
         return $this->defaultViewPath;
     }
 
+    /**
+     * @param $name
+     * @param string $value
+     * @throws \Exception
+     */
     public function with($name, $value = ''){
         if(empty($name)){
             throw new \Exception("Data is invalid.", 1);
@@ -49,6 +67,12 @@ class View
         }
     }
 
+    /**
+     * @param string $file
+     * @param array $data
+     * @return string
+     * @throws \Exception
+     */
     public function render($file = '' , $data = []){
         if(empty($file)){
             $file = $this->file;

@@ -55,6 +55,9 @@ class Application
         }
     }
 
+    /**
+     * @return string
+     */
     public function getResponse(){
         return $this->response->getResponseContent();
     }

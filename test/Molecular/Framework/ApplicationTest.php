@@ -8,7 +8,7 @@
  */
 class ApplicationTest extends PHPUnit_Framework_TestCase
 {
-    public function testAddMolecule(){
+    public function testRoute(){
         $application = new \Molecular\Framework\Application();
         $this->assertNotEmpty($application->route);
         $_SERVER['REQUEST_URI'] = 'test';
@@ -17,4 +17,15 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
         $application->run();
         $this->assertEquals('ok',$application->getResponse());
     }
+    
+    public function testServiceContainer(){
+        $application = new \Molecular\Framework\Application();
+        $application->container->set('teste',10);
+        $this->assertEquals($application->container->get('teste'),10);
+        $application->container->set('callback',function(){
+            return 20;
+        });
+        $this->assertEquals($application->container->get('callback'),20);
+    }
+    
 }

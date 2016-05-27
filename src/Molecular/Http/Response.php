@@ -8,10 +8,17 @@
 		    $this->responseContent = '';
 		}
 
+		/**
+		 * @return string
+         */
 		public function getResponseContent(){
 			return $this->responseContent;
 		}
 
+		/**
+		 * @param $context
+		 * @param bool $subscribe
+         */
 		public function setResponseContent($context , $subscribe = false){
 			if($subscribe){
 				$this->responseContent = $context;
@@ -20,6 +27,10 @@
 			}
 		}
 
+		/**
+		 * @param string $nameHeader
+		 * @return array|mixed|null
+         */
 		public function getHeader($nameHeader = ''){
 			$headers = [];
 			foreach (headers_list() as $value) {
@@ -35,6 +46,9 @@
 			return $headers;
 		}
 
+		/**
+		 * @param $header
+         */
 		public function setHeader($header){
 			header($header);
 		}
