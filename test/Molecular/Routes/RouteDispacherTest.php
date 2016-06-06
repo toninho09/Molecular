@@ -13,44 +13,69 @@ use Molecular\Routes\RouteDispacher;
 
 class RouteDispacherTest extends \PHPUnit_Framework_TestCase
 {
+    private $dispacher;
 
-    public function testDispacherTeste()
+    public function __construct()
     {
-        $dispacher = new RouteDispacher();
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_SERVER['REQUEST_URI'] = '/test';
-        $dispacher->post('test', function () {
+        $this->dispacher = new RouteDispacher();
+    }
+
+    private function setHeaders($method, $uri)
+    {
+        $_SERVER['REQUEST_METHOD'] = $method;
+        $_SERVER['REQUEST_URI'] = $uri;
+    }
+
+    public function testRouteWithFunction()
+    {
+        $this->setHeaders('POST', '/test');
+
+        $this->dispacher->post('test', function () {
             return 'ok';
         });
-        $this->assertEquals('ok', $dispacher->run(), 'Verificando Se o dipacher retorna a rota');
 
-        $dispacher->post('outraRota', function () {
+        $this->assertEquals('ok', $this->dispacher->run(), 'Verificando Se o dipacher retorna a rota');
+    }
+
+    public function testTwoRoutes()
+    {
+        $this->setHeaders('POST', '/test');
+
+        $this->dispacher->post('test', function () {
+            return 'ok';
+        });
+
+        $this->dispacher->post('outraRota', function () {
             return 'outra';
         });
-        $this->assertEquals('ok', $dispacher->run(), 'Verificando Se com mais de uma rota ainda chama a certa');
 
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->assertEquals('', $dispacher->run(), 'Verifica se está considerando o methodo para encontrar a rota');
+        $this->assertEquals('ok', $this->dispacher->run(), 'Verificando Se com mais de uma rota ainda chama a certa');
+    }
 
-        $dispacher->get('test', function () {
+    public function testSameRouteWithDifferentMethods()
+    {
+        $this->dispacher->post('test', function () {
+            return 'post';
+        });
+
+        $this->dispacher->get('test', function () {
             return 'get';
         });
 
-        $this->assertEquals('get', $dispacher->run(), 'Verifica se o trás a rota mesmo com 2 cadastradas para a mesma rota e metodos diferentes');
+        $uri = '/test';
 
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->setHeaders('POST', $uri);
+        $this->assertEquals('post', $this->dispacher->run(), 'Verifica se está considerando o methodo para encontrar a rota');
 
-        $this->assertEquals('ok', $dispacher->run(), 'Verifica se a rota anterior não sobrescreveu a antiga');
+        $this->setHeaders('GET', $uri);
+        $this->assertEquals('get', $this->dispacher->run(), 'Verifica se está considerando o methodo para encontrar a rota');
     }
 
     public function testGrupoDeRotas()
     {
+        $this->setHeaders('POST', '/test/teste');
 
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_SERVER['REQUEST_URI'] = '/test/teste';
-
-        $dispacher = new RouteDispacher();
-        $dispacher->group('test', function ($routes) {
+        $this->dispacher->group('test', function ($routes) {
             $routes->post('teste', function () {
                 return 'ok';
             });
@@ -58,10 +83,7 @@ class RouteDispacherTest extends \PHPUnit_Framework_TestCase
             return 'ok';
         }]]);
 
-        $this->assertEquals('okok', $dispacher->run(), "verifica o retorno no caso de rotas em grupos");
-
+        $this->assertEquals('okok', $this->dispacher->run(), "verifica o retorno no caso de rotas em grupos");
     }
-
-
 }
 
