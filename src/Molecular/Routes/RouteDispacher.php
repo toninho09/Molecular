@@ -215,17 +215,43 @@ class RouteDispacher
      */
     public function run()
     {
-        if ($this->filters->exists('before')) $this->filters->run('before');
         $buffer = '';
+
+        $matchedRoutes = $this->getMatchedRoutes();
+
+        if (empty($matchedRoutes)) {
+            throw new \Exception('Route not found');
+        }
+
+        if ($this->filters->exists('before')) $this->filters->run('before');
+
+        $this->runMatchedRoutes($buffer, $matchedRoutes);
+
+        if ($this->filters->exists('after')) $this->filters->run('after');
+
+        return $buffer;
+    }
+
+    private function getMatchedRoutes()
+    {
+        $matchedRoutes = [];
+
         foreach ($this->routes as $route) {
             if ($route->isValidMethod() && $route->isRouteValid()) {
-                $buffer = $route->run();
+                $matchedRoutes[] = $route;
                 if ($route->next()) continue;
                 break;
             }
         }
-        if ($this->filters->exists('after')) $this->filters->run('after');
-        return $buffer;
+
+        return $matchedRoutes;
+    }
+
+    private function runMatchedRoutes(&$buffer, $routes)
+    {
+        foreach ($routes as $route) {
+            $buffer = $route->run();
+        }
     }
 
     /**

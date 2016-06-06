@@ -49,7 +49,12 @@ class Application
 
 
     public function run(){
-        $this->response->setResponseContent($this->route->run());
+        try {
+            $this->response->setResponseContent($this->route->run());
+        } catch (\Exception $e) {
+            $this->response->setResponseContent($e->getMessage());
+        }
+
         foreach ($this->moleculeDispancer as $value){
             $value->run();
         }

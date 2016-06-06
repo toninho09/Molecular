@@ -8,7 +8,6 @@
 
 namespace Tests\Molecular\Routes;
 
-
 use Molecular\Routes\RouteDispacher;
 
 class RouteDispacherTest extends \PHPUnit_Framework_TestCase
@@ -69,6 +68,18 @@ class RouteDispacherTest extends \PHPUnit_Framework_TestCase
 
         $this->setHeaders('GET', $uri);
         $this->assertEquals('get', $this->dispacher->run(), 'Verifica se está considerando o methodo para encontrar a rota');
+    }
+
+    public function testRouteThatDoesNotExist()
+    {
+        $dispacher = new RouteDispacher();
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/home';
+
+        $this->setExpectedException('Exception');
+
+        $dispacher->run();
     }
 
     public function testGrupoDeRotas()
