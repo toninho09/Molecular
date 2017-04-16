@@ -177,7 +177,7 @@ class RouteDispacher
      */
     private function fixPrefix($prefix)
     {
-        if (substr($this->prefix, -1) != '/' && $prefix{0} != '/') {
+        if ($prefix != '' && substr($this->prefix, -1) != '/' && $prefix{0} != '/') {
             $prefix = '/' . $prefix;
         }
         return $prefix;
@@ -199,7 +199,7 @@ class RouteDispacher
     public function group($nameGroup, $callback, $params = [])
     {
         $dispacher = new RouteDispacher();
-        $dispacher->setPrefix($this->fixPrefix($nameGroup));
+        $dispacher->setPrefix( $this->prefix . $this->fixPrefix($nameGroup));
         $callback($dispacher);
         $routes = $dispacher->getRoutes();
         foreach ($routes as $keyRoute => $valueRoute) {
