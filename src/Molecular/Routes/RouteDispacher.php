@@ -9,53 +9,25 @@
 namespace Molecular\Routes;
 
 
+use Molecular\Http\Request;
+use Molecular\Http\Response;
+use Molecular\Injection\Resolve;
+use Molecular\Routes\Middleware\Middleware;
+
 class RouteDispacher
 {
 
     private $routes = [];
     private $notFound;
-    private $next;
-    private $filters;
     private $prefix;
+    private $middleware;
+    private $resolve;
 
     public function __construct()
     {
         $this->prefix = '';
-        $this->next = false;
-        $this->filters = new Filter();
-    }
-
-    /**
-     * @param $function
-     */
-    public function after($function)
-    {
-        $this->filters->setFilter('after', $function);
-    }
-
-    /**
-     * @param $function
-     */
-    public function before($function)
-    {
-        $this->filters->setFilter('before', $function);
-    }
-
-    /**
-     * @param $name
-     * @param $function
-     */
-    public function filter($name, $function)
-    {
-        $this->filters->setFilter($name, $function);
-    }
-
-    /**
-     * @return Filter
-     */
-    public function getFilters()
-    {
-        return $this->filters;
+        $this->middleware = [];
+        $this->resolve = new Resolve();
     }
 
     /**
@@ -147,14 +119,6 @@ class RouteDispacher
     }
 
     /**
-     *
-     */
-    public function next()
-    {
-        $this->next = true;
-    }
-
-    /**
      * @param $method
      * @param $name
      * @param $function
@@ -199,18 +163,18 @@ class RouteDispacher
     public function group($nameGroup, $callback, $params = [])
     {
         $dispacher = new RouteDispacher();
-        $dispacher->setPrefix( $this->prefix . $this->fixPrefix($nameGroup));
+        $dispacher->setPrefix($this->prefix . $this->fixPrefix($nameGroup));
         $callback($dispacher);
         $routes = $dispacher->getRoutes();
         foreach ($routes as $keyRoute => $valueRoute) {
-            if (!empty($params['filters'])) $valueRoute->getFilter()->setArrayFilter($params['filters']);
+            if (!empty($params['middleware'])) $valueRoute->addMiddlewares($params['middleware']);
             $this->routes[] = $valueRoute;
             unset($routes[$keyRoute]);
         }
     }
 
     /**
-     * @return string
+     * @return Response
      * @throws \Exception
      */
     public function run()
@@ -223,35 +187,48 @@ class RouteDispacher
             throw new \Exception('Route not found');
         }
 
-        if ($this->filters->exists('before')) $this->filters->run('before');
-
-        $this->runMatchedRoutes($buffer, $matchedRoutes);
-
-        if ($this->filters->exists('after')) $this->filters->run('after');
-
-        return $buffer;
+        return $this->runMatchedRoutes($matchedRoutes);
     }
 
+    /**
+     * @return Route|null
+     */
     private function getMatchedRoutes()
     {
-        $matchedRoutes = [];
-
         foreach ($this->routes as $route) {
+            /** @var Route $route */
             if ($route->isValidMethod() && $route->isRouteValid()) {
-                $matchedRoutes[] = $route;
-                if ($route->next()) continue;
-                break;
+                return $route;
             }
         }
-
-        return $matchedRoutes;
+        return null;
     }
 
-    private function runMatchedRoutes(&$buffer, $routes)
+    /**
+     * @param $buffer
+     * @param $routes
+     * @return Response
+     */
+    private function runMatchedRoutes(Route $route)
     {
-        foreach ($routes as $route) {
-            $buffer = $route->run();
+
+        $midllewares = array_reverse($route->getMiddleware());
+        $midlleware = null;
+
+        foreach ($midllewares as $md){
+            if(!is_object($md)){
+                $md = $this->resolve->resolve($md);
+            }
+            /** @var Middleware $md */
+            if(!$midlleware){
+                $midlleware = $md;
+            }else{
+                $md->setNextMiddleware($midlleware);
+                $midlleware = $md;
+            }
         }
+        $midlleware->handle(new Request(),new Response());
+        return $midlleware->getResponse();
     }
 
     /**
@@ -298,8 +275,29 @@ class RouteDispacher
 
         $route = new Route($this->prefix . $name, $method, $function);
         if (isset($params['as'])) $route->setName($params['as']);
-        if (isset($params['filters'])) $route->getFilter()->setArrayFilter($params['filters']);
-        if (isset($params['next'])) $route->setNext();
+        if (isset($params['middleware'])) $route->addMiddleware($params['middleware']);
         $this->routes[] = $route;
+    }
+
+
+    public function addMiddleware($class)
+    {
+        $this->middleware[] = $class;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMiddleware()
+    {
+        return $this->middleware;
+    }
+
+    /**
+     * @param array $middleware
+     */
+    public function setMiddleware($middleware)
+    {
+        $this->middleware = $middleware;
     }
 }

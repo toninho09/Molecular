@@ -9,6 +9,9 @@
 namespace Molecular\Routes;
 
 use Molecular\Helper\Callbacks\Call;
+use Molecular\Injection\Resolve;
+use Molecular\Routes\Middleware\Middleware;
+use Molecular\Routes\Middleware\RouteBaseMiddleware;
 
 class Route
 {
@@ -17,10 +20,8 @@ class Route
     private $route = null;
     private $call = null;
     private $name = '';
-    private $filter = '';
     private $method = '';
-    private $next = false;
-    
+    private $middlewares = [];
     
     /**
      * Route constructor.
@@ -34,25 +35,9 @@ class Route
         $this->function = $function;
         $this->route = $this->putRegex($route);
         $this->call = new Call();
-        $this->filter = new Filter();
+        $this->resolve = new Resolve();
     }
 
-    public function setNext(){
-        $this->next = true;
-    }
-
-    public function next(){
-        return $this->next;
-    }
-
-    /**
-     * @return Filter|string
-     */
-    public function getFilter()
-    {
-        return $this->filter;
-    }
-    
     /**
      * @return string
      */
@@ -87,6 +72,26 @@ class Route
         return false;
     }
 
+    public function getMiddleware(){
+        if(!$this->haveRouteBaseMiddlewareInMiddlewareList()) {
+            $middleware = new RouteBaseMiddleware();
+            $middleware->setRoute($this);
+            $this->addMiddleware($middleware);
+        }
+        return $this->middlewares;
+    }
+
+    private function haveRouteBaseMiddlewareInMiddlewareList(){
+        foreach ($this->middlewares as $md){
+            if($md instanceof RouteBaseMiddleware){
+                if($md->getRoute() == $this){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * @return string
      * @throws \Exception
@@ -94,9 +99,7 @@ class Route
     public function run(){
         if(!$this->isRouteValid()) throw new \Exception("This Route is not valid to call");
         $buffer = '';
-        if($this->filter->exists('before'))$buffer .= $this->filter->run('before');
         $buffer .= $this->call->runFunction($this->function,$this->getParams());
-        if($this->filter->exists('after')) $buffer .= $this->filter->run('after');
         return $buffer;
     }
 
@@ -115,6 +118,23 @@ class Route
      */
     private function putRegex($name){
         return preg_replace(['/{\w+}/','/\/{\w+\?}/','/\\//','/\//'],['(\w+)','(\/\w+)?','/','\\/'],$name);
+    }
+
+
+    /**
+     * @param array $middlewares
+     */
+    public function setMiddlewares($middlewares)
+    {
+        $this->middlewares = $middlewares;
+    }
+
+    public function addMiddleware($middleware){
+        if(is_array($middleware)){
+            $this->middlewares = array_merge($this->middlewares,$middleware);
+        }else{
+            $this->middlewares[] = $middleware;
+        }
     }
 
 }

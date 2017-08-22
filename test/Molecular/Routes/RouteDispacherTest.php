@@ -33,7 +33,7 @@ class RouteDispacherTest extends \PHPUnit_Framework_TestCase
             return 'ok';
         });
 
-        $this->assertEquals('ok', $this->dispacher->run(), 'Verificando Se o dipacher retorna a rota');
+        $this->assertEquals('ok', $this->dispacher->run()->getResponseContent(), 'Verificando Se o dipacher retorna a rota');
     }
 
     public function testTwoRoutes()
@@ -48,7 +48,7 @@ class RouteDispacherTest extends \PHPUnit_Framework_TestCase
             return 'outra';
         });
 
-        $this->assertEquals('ok', $this->dispacher->run(), 'Verificando Se com mais de uma rota ainda chama a certa');
+        $this->assertEquals('ok', $this->dispacher->run()->getResponseContent(), 'Verificando Se com mais de uma rota ainda chama a certa');
     }
 
     public function testSameRouteWithDifferentMethods()
@@ -64,10 +64,10 @@ class RouteDispacherTest extends \PHPUnit_Framework_TestCase
         $uri = '/test';
 
         $this->setHeaders('POST', $uri);
-        $this->assertEquals('post', $this->dispacher->run(), 'Verifica se está considerando o methodo para encontrar a rota');
+        $this->assertEquals('post', $this->dispacher->run()->getResponseContent(), 'Verifica se está considerando o methodo para encontrar a rota');
 
         $this->setHeaders('GET', $uri);
-        $this->assertEquals('get', $this->dispacher->run(), 'Verifica se está considerando o methodo para encontrar a rota');
+        $this->assertEquals('get', $this->dispacher->run()->getResponseContent(), 'Verifica se está considerando o methodo para encontrar a rota');
     }
 
     public function testRouteThatDoesNotExist()
@@ -82,19 +82,29 @@ class RouteDispacherTest extends \PHPUnit_Framework_TestCase
         $dispacher->run();
     }
 
-    public function testGrupoDeRotas()
-    {
-        $this->setHeaders('POST', '/test/teste');
+    public function testeRouteWithMiddleware(){
 
-        $this->dispacher->group('test', function ($routes) {
-            $routes->post('teste', function () {
-                return 'ok';
-            });
-        }, ['filters' => ['before' => function () {
-            return 'ok';
-        }]]);
+        $this->dispacher->post('test', function () {
+            return 'post';
+        },['middleware' => TesteMiddleware::class]);
+        $uri = '/test';
+        $this->setHeaders('POST', $uri);
 
-        $this->assertEquals('okok', $this->dispacher->run(), "verifica o retorno no caso de rotas em grupos");
+        $this->assertEquals('test1posttest2', $this->dispacher->run()->getResponseContent(), 'Verifica se está considerando o methodo para encontrar a rota');
+
     }
+
+    public function testeRouteWithManyMiddleware(){
+
+        $this->dispacher->post('test', function () {
+            return 'post';
+        },['middleware' => [FooMiddleware::class,TesteMiddleware::class]]);
+        $uri = '/test';
+        $this->setHeaders('POST', $uri);
+
+        $this->assertEquals('footest1posttest2bar', $this->dispacher->run()->getResponseContent(), 'Verifica se está considerando o methodo para encontrar a rota');
+
+    }
+
 }
 

@@ -9,6 +9,7 @@
 namespace Tests\Molecular\Routes;
 
 
+use Molecular\Routes\Middleware\RouteBaseMiddleware;
 use Molecular\Routes\Route;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
@@ -34,22 +35,11 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($route->isRouteValid(),'Classe de rota não deve reconhecer a rota com parametros obrigatórios faltando');
     }
 
-    public function testFilter(){
-        $route = new Route('test','POST',function(){
-            return '2';
-        });
-        $route->getFilter()->setFilter('before',function(){
-            return '1';
-        });
-        $route->getFilter()->setFilter('after',function(){
-           return '3';
-        });
-
-        $_SERVER['REQUEST_URI'] = '/test';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-
-        $this->assertTrue($route->isRouteValid(),"Metodo Valido Com filtros");
-
-        $this->assertEquals('123',$route->run(),"verifica o retorno dos filtros");
+    public function testeRouteMiddleware(){
+        $route = new Route('test','POST',function(){});
+        $middlewares = $route->getMiddleware();
+        $this->assertCount(1,$middlewares,'Deve-se criar o middleware padrao para processamento da rota');
+        $middleware = array_pop($middlewares);
+        $this->assertInstanceOf(RouteBaseMiddleware::class,$middleware,'Deve-se criar o middleware padrao para tratamento de rota');
     }
 }

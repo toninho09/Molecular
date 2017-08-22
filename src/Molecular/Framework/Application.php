@@ -13,6 +13,7 @@ use Molecular\Cache\CacheControler;
 use Molecular\Container\ServiceContainer;
 use Molecular\Http\Request;
 use Molecular\Http\Response;
+use Molecular\Injection\Resolve;
 use Molecular\Routes\RouteDispacher;
 
 class Application
@@ -24,6 +25,7 @@ class Application
     public $route;
     public $container;
     public $cache;
+    public $inject;
     public static $instance;
     /**
      * Application constructor.
@@ -37,6 +39,7 @@ class Application
         $this->container = new ServiceContainer();
         $cache = new CacheControler();
         $this->cache = $cache->getHandle();
+        $this->inject = new Resolve();
         self::$instance = $this;
     }
 
@@ -50,7 +53,7 @@ class Application
 
     public function run(){
         try {
-            $this->response->setResponseContent($this->route->run());
+            $this->response = $this->route->run();
         } catch (\Exception $e) {
             $this->response->setResponseContent($e->getMessage());
         }
