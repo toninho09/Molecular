@@ -84,7 +84,8 @@ class Route
     private function haveRouteBaseMiddlewareInMiddlewareList(){
         foreach ($this->middlewares as $md){
             if($md instanceof RouteBaseMiddleware){
-                if($md->getRoute() == $this){
+                /** @var RouteBaseMiddleware $md */
+                if($md->getRoute() === $this){
                     return true;
                 }
             }
@@ -131,7 +132,7 @@ class Route
 
     public function addMiddleware($middleware){
         if(is_array($middleware)){
-            $this->middlewares = array_merge($this->middlewares,$middleware);
+            $this->setMiddlewares(array_merge($this->middlewares,$middleware));
         }else{
             $this->middlewares[] = $middleware;
         }

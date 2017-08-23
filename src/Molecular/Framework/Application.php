@@ -21,18 +21,17 @@ class Application
 
     public $response;
     public $request;
-    private $moleculeDispancer;
     public $route;
     public $container;
     public $cache;
     public $inject;
     public static $instance;
+
     /**
      * Application constructor.
      */
     public function __construct()
     {
-        $this->moleculeDispancer = [];
         $this->route = new RouteDispacher();
         $this->request = new Request();
         $this->response = new Response();
@@ -43,36 +42,17 @@ class Application
         self::$instance = $this;
     }
 
-    public function addMolecule(AbstractMolecule $molecule){
-        $molecule->boot();
-        $molecule->register();
-        $this->{$molecule->getName()} = &$molecule->getInstance();
-        $this->moleculeDispancer[$molecule->getName()] = $molecule;
+    public function run()
+    {
+        $this->response = $this->route->run();
     }
 
-
-    public function run(){
-        try {
-            $this->response = $this->route->run();
-        } catch (\Exception $e) {
-            $this->response->setResponseContent($e->getMessage());
-        }
-
-        foreach ($this->moleculeDispancer as $value){
-            $value->run();
-        }
-    }
-
-    public function end(){
-        foreach ($this->moleculeDispancer as $value){
-            $value->end();
-        }
-    }
 
     /**
      * @return string
      */
-    public function getResponse(){
+    public function getResponse()
+    {
         return $this->response->getResponseContent();
     }
 }

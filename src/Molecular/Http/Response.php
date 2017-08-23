@@ -27,24 +27,21 @@
 			}
 		}
 
-		/**
-		 * @param string $nameHeader
-		 * @return array|mixed|null
+        /**
+         * @param null $header
+         * @return array|mixed|null
+         * @internal param string $nameHeader
          */
-		public function getHeader($nameHeader = ''){
-			$headers = [];
-			foreach (headers_list() as $value) {
-				$temp = '';
-				preg_match('/^(\X.*):(\X.*)$/', $value ,$temp);
-				$headers[$temp[1]] = $temp[2];
-			}
-			if(!empty($nameHeader)){
-				if(!isset($headers[$nameHeader]))
-					return null;
-				return $headers[$nameHeader];
-			}
-			return $headers;
-		}
+        public function getHeaders($header = null){
+            if(empty($header)){
+                return $this->getallheaders();
+            }else{
+                if(!isset($this->getallheaders()[$header])){
+                    return null;
+                }
+                return $this->getallheaders()[$header];
+            }
+        }
 
 		/**
 		 * @param $header
@@ -52,5 +49,26 @@
 		public function setHeader($header){
 			header($header);
 		}
-		
+
+        /**
+         * @return array|false
+         */
+        private function getallheaders(){
+            if (!function_exists('getallheaders'))
+            {
+                function getallheaders()
+                {
+                    $headers = array ();
+                    foreach ($_SERVER as $name => $value)
+                    {
+                        if (substr($name, 0, 5) == 'HTTP_')
+                        {
+                            $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+                        }
+                    }
+                    return $headers;
+                }
+            }
+            return getallheaders();
+        }
 	}

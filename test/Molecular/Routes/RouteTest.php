@@ -42,4 +42,12 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $middleware = array_pop($middlewares);
         $this->assertInstanceOf(RouteBaseMiddleware::class,$middleware,'Deve-se criar o middleware padrao para tratamento de rota');
     }
+
+    public function testeMiddleware(){
+
+        $route = new Route('test','POST',function(){});
+        $middleware = new RouteBaseMiddleware();
+        $middleware->setRoute($route);
+        $this->assertEquals($route, $middleware->getRoute());
+    }
 }

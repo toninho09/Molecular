@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" bootstrap="vendor/autoload.php">
+    <testsuites>
+        <testsuite name="mytest">
+            <directory>./test</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- whitelisting section.
+         All php files in the myclasses directory will be whitelisted for testing
+    -->
+    <filter>
+        <whitelist  >
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+</phpunit>

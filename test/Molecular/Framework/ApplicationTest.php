@@ -27,5 +27,15 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
         });
         $this->assertEquals($application->container->get('callback'),20);
     }
+
+    public function testRouteApplicationException(){
+        $application = new \Molecular\Framework\Application();
+        $this->assertNotEmpty($application->route);
+        $_SERVER['REQUEST_URI'] = 'test';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $application->route->get('test',function(){throw new \Exception();});
+        $this->setExpectedException('Exception');
+        $application->run();
+    }
     
 }

@@ -20,5 +20,16 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($input->post('teste_post'),'post','o metodo post deve pegar o valor' );
         $this->assertEquals($input->get('teste_post'),'post','o metodo get tbm deve pegar o valor' );
     }
-    
+
+    public function testCookies(){
+        $input = new \Molecular\Http\Input();
+        $_COOKIE['test'] = 'test';
+        $this->assertEquals('test',$input->cookie('test'));
+        $this->assertEquals('default',$input->cookie('test2','default'));
+    }
+
+    public function testStream(){
+        $input = new \Molecular\Http\Input();
+        $this->assertEmpty($input->stream());
+    }
 }
