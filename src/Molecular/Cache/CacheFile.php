@@ -50,13 +50,15 @@ class CacheFile implements CacheHandle
     }
 
     /**
-     * Add one value in the cache,
+     * Add one value in the cache only if the value does not already exist,
      * @param string  $key     the key using to rescue the cache value
      * @param mixed  $content  the value of the cache
      * @param integer $time    the time to rescue the cache, in minutes
      */
     public function add($key,$content,$time = 60){
+        if($this->has($key)) return false;
         $this->set($key,$content,$time);
+        return true;
     }
 
     /**

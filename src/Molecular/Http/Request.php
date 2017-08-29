@@ -3,6 +3,7 @@
 	class Request{
 
         private $input;
+        private $header;
 
         /**
          * Request constructor.
@@ -10,6 +11,11 @@
         public function __construct()
         {
             $this->input = new Input();
+            $this->header = new Headers();
+        }
+
+        public function setHeader(Headers $header){
+            $this->header = $header;
         }
 
 		/**
@@ -93,34 +99,12 @@
 		 * @param $header
 		 * @return array|false|null
          */
-		public function getHeaders($header = null){
-			if(empty($header)){
-				return $this->getallheaders();
-			}else{
-				if(!isset($this->getallheaders()[$header])){
-					return null;
-				}
-				return $this->getallheaders()[$header];
-			}
+		public function getHeaders($header = null,$default = null){
+            return $this->header->getHeader($header,$default);
 		}
 
 		private function getallheaders(){
-            if (!function_exists('getallheaders'))
-            {
-                function getallheaders()
-                {
-                    $headers = array ();
-                    foreach ($_SERVER as $name => $value)
-                    {
-                        if (substr($name, 0, 5) == 'HTTP_')
-                        {
-                            $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-                        }
-                    }
-                    return $headers;
-                }
-            }
-            return getallheaders();
+		    return $this->header->getAllHeader();
         }
 	}
 	

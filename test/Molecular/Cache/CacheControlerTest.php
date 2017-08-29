@@ -8,7 +8,9 @@
  */
 class CacheControlerTest extends PHPUnit_Framework_TestCase
 {
-    public function teste(){
-        
+    public function testSetFileCache(){
+        $cache = new \Molecular\Cache\CacheControler();
+        $cache->setHandle(new \Molecular\Cache\CacheFile());
+        $this->assertInstanceOf(\Molecular\Cache\CacheFile::class,$cache->getHandle());
     }
 }
