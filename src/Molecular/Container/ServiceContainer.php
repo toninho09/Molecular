@@ -41,7 +41,7 @@ class ServiceContainer
      * @throws \Exception
      */
     public function setSingleton($name, $singleton){
-        $this->get($name)->setSingleton($singleton);
+        $this->services[$name]->setSingleton($singleton);
     }
 
     /**

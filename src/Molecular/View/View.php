@@ -84,6 +84,7 @@ class View
         if (file_exists($fileFormat)){
             include $fileFormat;
         }else{
+            ob_get_clean();
             throw new \Exception("File [$fileFormat] Not Found.");
         }
         return ob_get_clean();

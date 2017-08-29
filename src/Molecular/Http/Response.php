@@ -2,10 +2,12 @@
 	namespace Molecular\Http;
 	class Response{
 		private $responseContent;
+		private $header;
 
 
 		public function __construct() {
 		    $this->responseContent = '';
+		    $this->header = new Headers();
 		}
 
 		/**
@@ -27,30 +29,26 @@
 			}
 		}
 
-		/**
-		 * @param string $nameHeader
-		 * @return array|mixed|null
+        /**
+         * @param null $header
+         * @return array|mixed|null
+         * @internal param string $nameHeader
          */
-		public function getHeader($nameHeader = ''){
-			$headers = [];
-			foreach (headers_list() as $value) {
-				$temp = '';
-				preg_match('/^(\X.*):(\X.*)$/', $value ,$temp);
-				$headers[$temp[1]] = $temp[2];
-			}
-			if(!empty($nameHeader)){
-				if(!isset($headers[$nameHeader]))
-					return null;
-				return $headers[$nameHeader];
-			}
-			return $headers;
-		}
+        public function getHeaders($header = null,$default = null){
+            $this->header->getHeader($header,$default);
+        }
+
+        /**
+         * @return array|false
+         */
+        private function getallheaders(){
+            $this->header->getAllHeader();
+        }
 
 		/**
 		 * @param $header
          */
 		public function setHeader($header){
-			header($header);
+		    $this->header->setHeader($header);
 		}
-		
 	}

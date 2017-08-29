@@ -3,6 +3,7 @@
 	class Request{
 
         private $input;
+        private $header;
 
         /**
          * Request constructor.
@@ -10,6 +11,11 @@
         public function __construct()
         {
             $this->input = new Input();
+            $this->header = new Headers();
+        }
+
+        public function setHeader(Headers $header){
+            $this->header = $header;
         }
 
 		/**
@@ -93,15 +99,12 @@
 		 * @param $header
 		 * @return array|false|null
          */
-		public function getHeaders($header){
-			if(!empty($header)){
-				return getallheaders();
-			}else{
-				if(!isset(getallheaders()[$header])){
-					return null;
-				}
-				return getallheaders()[$header];
-			}
+		public function getHeaders($header = null,$default = null){
+            return $this->header->getHeader($header,$default);
 		}
+
+		private function getallheaders(){
+		    return $this->header->getAllHeader();
+        }
 	}
 	
