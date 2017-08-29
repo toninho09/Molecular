@@ -43,13 +43,6 @@
             }
         }
 
-		/**
-		 * @param $header
-         */
-		public function setHeader($header){
-			header($header);
-		}
-
         /**
          * @return array|false
          */
@@ -71,4 +64,11 @@
             }
             return getallheaders();
         }
+
+		/**
+		 * @param $header
+         */
+		public function setHeader($header){
+			header($header);
+		}
 	}

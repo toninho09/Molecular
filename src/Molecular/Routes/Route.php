@@ -58,7 +58,7 @@ class Route
      * @return bool
      */
     public function isValidMethod(){
-        if($this->method == strtolower('any')) return true;
+        if(strtolower($this->method) == 'any') return true;
         return $this->method == $_SERVER['REQUEST_METHOD'];
     }
 

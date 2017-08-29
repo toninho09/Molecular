@@ -107,15 +107,7 @@ class RouteDispacher
      */
     public function any($name, $function, $params = [])
     {
-        $this->registerRoute($_SERVER['REQUEST_METHOD'], $name, $function, $params);
-    }
-
-    /**
-     * @param $function
-     */
-    public function setNotFound($function)
-    {
-        $this->notFound = $function;
+        $this->registerRoute('ANY', $name, $function, $params);
     }
 
     /**
@@ -198,6 +190,7 @@ class RouteDispacher
         foreach ($this->routes as $route) {
             /** @var Route $route */
             if ($route->isValidMethod() && $route->isRouteValid()) {
+                $route->addMiddleware($this->middleware);
                 return $route;
             }
         }
@@ -233,12 +226,13 @@ class RouteDispacher
 
     /**
      * @param $name
-     * @return mixed
+     * @return Route
      * @throws \Exception
      */
     public function getRouteByName($name)
     {
         foreach ($this->routes as $route) {
+            /** @var Route $route */
             if ($name == $route->getName()) return $route;
         }
         throw new \Exception('Route not found');
@@ -260,20 +254,17 @@ class RouteDispacher
      */
     private function registerRoute($method, $name, $function, $params = [])
     {
-        if (substr($name, 1) == '/') {
-            str_split($name, 1);
-        }
-        if ($this->prefix != '' && $this->prefix{0} != '/') {
-            $this->prefix = '/' . $this->prefix;
-        }
-        if ($this->prefix != '' && $this->prefix{strlen($this->prefix) - 1} != '/') {
+        if ($this->prefix != '' && substr($this->prefix,-1) != '/') {
             $this->prefix .= '/';
         }
         if ($this->prefix == '' && $name == '') {
             $this->prefix = '/';
         }
+        if ($name != '' && substr($name,-1) == '/') {
+            $name = substr($name,0,-1);
+        }
 
-        $route = new Route($this->prefix . $name, $method, $function);
+        $route = new Route(preg_replace('/\/+/',"/",$this->prefix.$name), $method, $function);
         if (isset($params['as'])) $route->setName($params['as']);
         if (isset($params['middleware'])) $route->addMiddleware($params['middleware']);
         $this->routes[] = $route;
