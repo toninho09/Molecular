@@ -6,7 +6,7 @@
             "email": "toninho0007@yahoo.com.br"
         }
     ],
-    "require": {
+    "require-dev": {
         "phpunit/phpunit": "4.6.*"
     },
     "autoload": {

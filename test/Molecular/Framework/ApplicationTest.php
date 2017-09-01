@@ -10,30 +10,30 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 {
     public function testRoute(){
         $application = new \Molecular\Framework\Application();
-        $this->assertNotEmpty($application->route);
+        $this->assertNotEmpty($application->getRoute());
         $_SERVER['REQUEST_URI'] = 'test';
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $application->route->get('test',function(){return 'ok';});
+        $application->getRoute()->get('test',function(){return 'ok';});
         $application->run();
-        $this->assertEquals('ok',$application->getResponse());
+        $this->assertEquals('ok',$application->getResponseContent());
     }
     
     public function testServiceContainer(){
         $application = new \Molecular\Framework\Application();
-        $application->container->set('teste',10);
-        $this->assertEquals($application->container->get('teste'),10);
-        $application->container->set('callback',function(){
+        $application->getContainer()->set('teste',10);
+        $this->assertEquals($application->getContainer()->get('teste'),10);
+        $application->getContainer()->set('callback',function(){
             return 20;
         });
-        $this->assertEquals($application->container->get('callback'),20);
+        $this->assertEquals($application->getContainer()->get('callback'),20);
     }
 
     public function testRouteApplicationException(){
         $application = new \Molecular\Framework\Application();
-        $this->assertNotEmpty($application->route);
+        $this->assertNotEmpty($application->getRoute());
         $_SERVER['REQUEST_URI'] = 'test';
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $application->route->get('test',function(){throw new \Exception();});
+        $application->getRoute()->get('test',function(){throw new \Exception();});
         $this->setExpectedException('Exception');
         $application->run();
     }
