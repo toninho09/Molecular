@@ -19,12 +19,12 @@ use Molecular\Routes\RouteDispacher;
 class Application
 {
 
-    public $response;
-    public $request;
-    public $route;
-    public $container;
-    public $cache;
-    public $inject;
+    private $response;
+    private $request;
+    private $route;
+    private $container;
+    private $cache;
+    private $inject;
     public static $instance;
 
     /**
@@ -32,27 +32,83 @@ class Application
      */
     public function __construct()
     {
-        $this->route = new RouteDispacher();
-        $this->request = new Request();
-        $this->response = new Response();
-        $this->container = new ServiceContainer();
-        $cache = new CacheControler();
-        $this->cache = $cache->getHandle();
-        $this->inject = new Resolve();
         self::$instance = $this;
     }
 
     public function run()
     {
-        $this->response = $this->route->run();
+        $this->response = $this->getRoute()->run();
     }
-
 
     /**
      * @return string
      */
-    public function getResponse()
+    public function getResponseContent()
     {
-        return $this->response->getResponseContent();
+        return $this->getResponse()->getResponseContent();
     }
+
+    public function getResponse(){
+        if(!$this->response) {
+            $this->response = new Response();
+        }
+        return $this->response;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        if(!$this->request){
+            $this->request = new Request();
+        }
+        return $this->request;
+    }
+
+    /**
+     * @return RouteDispacher
+     */
+    public function getRoute()
+    {
+        if(!$this->route){
+            $this->route = new RouteDispacher();
+        }
+        return $this->route;
+    }
+
+    /**
+     * @return ServiceContainer
+     */
+    public function getContainer()
+    {
+        if(!$this->container){
+            $this->container = new ServiceContainer();
+        }
+        return $this->container;
+    }
+
+    /**
+     * @return \Molecular\Cache\CacheHandle|null
+     */
+    public function getCache()
+    {
+        if(!$this->cache){
+            $cache = new CacheControler();
+            $this->cache = $cache->getHandle();
+        }
+        return $this->cache;
+    }
+
+    /**
+     * @return Resolve
+     */
+    public function getInject()
+    {
+        if(!$this->inject){
+            $this->inject = new Resolve();
+        }
+        return $this->inject;
+    }
+
 }
